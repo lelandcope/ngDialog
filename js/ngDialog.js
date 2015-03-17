@@ -527,7 +527,54 @@
 								var hammerTime = scope.hammerTime = $window.Hammer($dialog[0]);
 								hammerTime.on('tap', closeByDocumentHandler);
 							} else {
-								$dialog.bind('click', closeByDocumentHandler);
+								var distanceThreshold = 25;
+								var timeThreshold     = 500;
+								var tapped            = false;
+
+					            $dialog.on("touchstart", function(startEvent) {
+					                var moveHandler, removeTapHandler, tapHandler;
+					                var target = startEvent.target;
+					                var touchStart = startEvent.touches[0];
+					                var startX = touchStart.pageX;
+					                var startY = touchStart.pageY;
+
+					                removeTapHandler = function() {
+					                    $timeout.cancel();
+					                    $dialog.off("touchmove", moveHandler);
+					                    $dialog.off("touchend", tapHandler);
+					                };
+					                
+					                tapHandler = function(endEvent) {
+					                    endEvent.preventDefault();
+					                    removeTapHandler();
+					                    if (target === endEvent.target) {
+					                        tapped = true;
+					                        closeByDocumentHandler(endEvent);
+					                    }
+					                };
+					                
+					                moveHandler = function(moveEvent) {
+					                    var touchMove = moveEvent.touches[0];
+					                    var moveX = touchMove.pageX;
+					                    var moveY = touchMove.pageY;
+					                    
+					                    if (Math.abs(moveX - startX) > distanceThreshold || Math.abs(moveY - startY) > distanceThreshold) {
+					                        tapped = true;
+					                        return removeTapHandler();
+					                    }
+					                };
+					                
+					                $timeout(removeTapHandler, timeThreshold);
+
+					                $dialog.on("touchmove", moveHandler);
+					                $dialog.on("touchend", tapHandler);
+					            });
+					            
+					            $dialog.bind("click", function(event) {
+					                if (!tapped) {
+					                    closeByDocumentHandler(event);
+					                }
+					            });
 							}
 
 							dialogsCount += 1;
