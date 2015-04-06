@@ -549,7 +549,7 @@
                                 };
 
                                 moveHandler = function(moveEvent) {
-                                    var touchMove = moveEvent.touches[0];
+                                    var touchMove = moveEvent.originalEvent.touches[0] || moveEvent.originalEvent.changedTouches[0] || moveEvent.touches[0];
                                     var moveX = touchMove.pageX;
                                     var moveY = touchMove.pageY;
 
@@ -560,7 +560,7 @@
                                 };
 
                                 touchStartHandler = function(startEvent) {
-                                    var touchStart = startEvent.touches[0];
+                                    var touchStart = startEvent.originalEvent.touches[0] || startEvent.originalEvent.changedTouches[0] || startEvent.touches[0];
                                 	tapTarget = startEvent.target;
                                     tapStartX = touchStart.pageX;
                                     tapStartY = touchStart.pageY;
